@@ -7,16 +7,26 @@ class Block {
     this.data = data;
     this.previousHash = previousHash;
     this.hash = this.calculateHash();
+    this.nonce = 0;
   }
 
   calculateHash() {
-    return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data)).toString();
+    return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data)+this.nonce).toString();
+  }
+
+  mineBlock(difficulty) {
+    while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+      this.nonce++;
+      this.hash = this.calculateHash()
+    }
+    console.log("Block mined " + this.hash);
   }
 }
 
 class Blockchain {
   constructor() {
     this.chain = [this.createGenesisBlock()];
+    this.difficulty = 4;//hash starts with four 0s. higher the difficulty =, higher the time it takes to mine a block
   }
 
   createGenesisBlock() {
@@ -29,7 +39,8 @@ class Blockchain {
 
   addBlock(newBlock) {
     newBlock.previousHash = this.getLatestBlock().hash;
-    newBlock.hash = newBlock.calculateHash();
+    // newBlock.hash = newBlock.calculateHash();
+    newBlock.mineBlock(this.difficulty);
     this.chain.push(newBlock);
   }
 
@@ -60,6 +71,13 @@ console.log(JSON.stringify(ramaCoin, null, 4));
 console.log('is blockchain valid? ' + ramaCoin.isChainValid());//returns true
 
 //tampering data
-ramaCoin.chain[1].data = {amount: 120};
+ramaCoin.chain[1].data = { amount: 120 };
 ramaCoin.chain[1].hash = ramaCoin.chain[1].calculateHash();
 console.log('is blockchain valid after adding data? ' + ramaCoin.isChainValid());// returns false. 
+
+//mine block
+console.log("Mine block 1...");
+ramaCoin.addBlock(new Block(4, "18/02/2019", { amount: 003 }));
+
+console.log("Mine block 2...");
+ramaCoin.addBlock(new Block(4, "19/02/2019", { amount: 004 }));
