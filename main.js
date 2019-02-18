@@ -57,4 +57,9 @@ ramaCoin.addBlock(new Block(2, "15/02/2019", { amount: 001 }));
 ramaCoin.addBlock(new Block(3, "16/02/2019", { amount: 002 }));
 
 console.log(JSON.stringify(ramaCoin, null, 4));
-console.log('is blockchain valid? ' + ramaCoin.isChainValid());
+console.log('is blockchain valid? ' + ramaCoin.isChainValid());//returns true
+
+//tampering data
+ramaCoin.chain[1].data = {amount: 120};
+ramaCoin.chain[1].hash = ramaCoin.chain[1].calculateHash();
+console.log('is blockchain valid after adding data? ' + ramaCoin.isChainValid());// returns false. 
